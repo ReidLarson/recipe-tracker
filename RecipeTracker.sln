@@ -6,6 +6,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{36213412
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeTracker.Core", "src\RecipeTracker.Core\RecipeTracker.Core.csproj", "{F006FBC8-26F0-49A2-A5E2-B8FB835503A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeTracker.Api.Minimal", "src\RecipeTracker.Api.Minimal\RecipeTracker.Api.Minimal.csproj", "{B4EE388E-714C-47F9-9A31-039B28E20E22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,11 +15,16 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F006FBC8-26F0-49A2-A5E2-B8FB835503A7} = {8E595986-34C4-4F3D-AF85-97F811047447}
+		{B4EE388E-714C-47F9-9A31-039B28E20E22} = {8E595986-34C4-4F3D-AF85-97F811047447}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F006FBC8-26F0-49A2-A5E2-B8FB835503A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F006FBC8-26F0-49A2-A5E2-B8FB835503A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F006FBC8-26F0-49A2-A5E2-B8FB835503A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F006FBC8-26F0-49A2-A5E2-B8FB835503A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4EE388E-714C-47F9-9A31-039B28E20E22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4EE388E-714C-47F9-9A31-039B28E20E22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4EE388E-714C-47F9-9A31-039B28E20E22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4EE388E-714C-47F9-9A31-039B28E20E22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
