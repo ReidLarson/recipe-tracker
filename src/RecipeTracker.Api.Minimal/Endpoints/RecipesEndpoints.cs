@@ -1,5 +1,6 @@
 using RecipeTracker.Api.Minimal.Contracts.Responses;
 using RecipeTracker.Api.Minimal.Endpoints.Internal;
+using RecipeTracker.Core.Repositories;
 
 namespace RecipeTracker.Api.Minimal.Endpoints;
 
@@ -16,15 +17,13 @@ public class RecipesEndpoints : IEndpoints
             .WithTags(Tag);
     }
 
-    private static IResult GetAllRecipes()
+    private static async Task<IResult> GetAllRecipes(IRecipesRepository recipesRepository,
+        CancellationToken cancellationToken = default)
     {
-        return Results.Ok(new[]
-        {
-            new RecipeResponse
-            {
-                Name = "Chicken Pot Pie",
-                Description = "Delicious"
-            }
-        });
+        var recipes = await recipesRepository.GetAllRecipes(cancellationToken);
+
+        var response = recipes.Select(RecipeResponse.FromRecipe);
+
+        return Results.Ok(response);
     }
 }

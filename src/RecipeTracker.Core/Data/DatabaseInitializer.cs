@@ -18,10 +18,10 @@ public class DatabaseInitializer
         await connection.ExecuteAsync(
             new CommandDefinition(
                 """
-                CREATE TABLE IF NOT EXISTS recipes(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT,
-                    description TEXT
+                CREATE TABLE IF NOT EXISTS recipes (
+                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    description TEXT NOT NULL
                 )
                 """,
                 cancellationToken: cancellationToken));
