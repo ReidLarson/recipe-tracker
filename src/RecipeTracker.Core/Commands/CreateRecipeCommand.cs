@@ -1,8 +1,7 @@
-namespace RecipeTracker.Core.Models;
+namespace RecipeTracker.Core.Commands;
 
-public record Recipe
+public class CreateRecipeCommand
 {
-    public required int Id { get; init; }
     public required string Name { get; set; }
     public required string Description { get; set; }
 }

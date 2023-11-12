@@ -1,4 +1,5 @@
 using Dapper;
+using RecipeTracker.Core.Commands;
 using RecipeTracker.Core.Data;
 using RecipeTracker.Core.Models;
 
@@ -27,5 +28,24 @@ public class RecipesRepository : IRecipesRepository
         );
 
         return recipes;
+    }
+
+    public async Task<Recipe> CreateRecipe(CreateRecipeCommand createRecipeCommand,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var recipe = await connection.QuerySingleAsync<Recipe>(
+            new CommandDefinition(
+                """
+                INSERT INTO recipes (name, description)
+                VALUES (@Name, @Description)
+                RETURNING id, name, description
+                """,
+                createRecipeCommand,
+                cancellationToken: cancellationToken
+            )
+        );
+
+        return recipe;
     }
 }
