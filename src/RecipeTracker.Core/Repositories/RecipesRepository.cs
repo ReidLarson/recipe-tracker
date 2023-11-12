@@ -71,4 +71,23 @@ public class RecipesRepository : IRecipesRepository
 
         return recipe;
     }
+
+    public async Task<OneOf<Success, NotFound>> DeleteRecipe(RecipeId id, CancellationToken cancellationToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var rowsAffected = await connection.ExecuteAsync(
+            new CommandDefinition(
+                """
+                DELETE FROM recipes
+                WHERE id = @Id
+                """,
+                new { Id = id.Value },
+                cancellationToken: cancellationToken
+            )
+        );
+
+        return rowsAffected is 0
+            ? new NotFound()
+            : new Success();
+    }
 }

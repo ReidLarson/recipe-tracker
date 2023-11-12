@@ -12,4 +12,6 @@ public interface IRecipesRepository
     Task<OneOf<Recipe, NotFound>> GetRecipe(RecipeId id, CancellationToken cancellationToken = default);
 
     Task<Recipe> CreateRecipe(CreateRecipeCommand createRecipeCommand, CancellationToken cancellationToken = default);
+
+    Task<OneOf<Success, NotFound>> DeleteRecipe(RecipeId id, CancellationToken cancellationToken = default);
 }
