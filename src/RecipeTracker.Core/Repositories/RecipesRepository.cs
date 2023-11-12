@@ -1,4 +1,6 @@
 using Dapper;
+using OneOf;
+using OneOf.Types;
 using RecipeTracker.Core.Commands;
 using RecipeTracker.Core.Data;
 using RecipeTracker.Core.Models;
@@ -28,6 +30,27 @@ public class RecipesRepository : IRecipesRepository
         );
 
         return recipes;
+    }
+
+    public async Task<OneOf<Recipe, NotFound>> GetRecipe(RecipeId id, CancellationToken cancellationToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+
+        var recipe = await connection.QuerySingleOrDefaultAsync<Recipe>(
+            new CommandDefinition(
+                """
+                SELECT id, name, description
+                FROM recipes
+                WHERE id = @Id
+                """,
+                new { Id = id.Value },
+                cancellationToken: cancellationToken
+            )
+        );
+
+        return recipe is null
+            ? new NotFound()
+            : recipe;
     }
 
     public async Task<Recipe> CreateRecipe(CreateRecipeCommand createRecipeCommand,

@@ -1,6 +1,7 @@
 using System.Net.Mime;
 using RecipeTracker.Api.Minimal.Contracts.Responses;
 using RecipeTracker.Api.Minimal.Endpoints.Internal;
+using RecipeTracker.Core.Models;
 using RecipeTracker.Core.Repositories;
 
 namespace RecipeTracker.Api.Minimal.Endpoints;
@@ -15,6 +16,12 @@ public class RecipesEndpoints : IEndpoints
         app.MapGet(BaseRoute, GetAllRecipes)
             .WithName(nameof(GetAllRecipes))
             .Produces<IEnumerable<RecipeResponse>>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .WithTags(Tag);
+
+        app.MapGet($"{BaseRoute}/{{id:int}}", GetRecipe)
+            .WithName(nameof(GetRecipe))
+            .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .Produces(StatusCodes.Status404NotFound)
             .WithTags(Tag);
 
         app.MapPost(BaseRoute, CreateRecipe)
@@ -32,6 +39,16 @@ public class RecipesEndpoints : IEndpoints
         var response = recipes.Select(RecipeResponse.FromRecipe);
 
         return Results.Ok(response);
+    }
+
+    private static async Task<IResult> GetRecipe(int id, IRecipesRepository recipesRepository,
+        CancellationToken cancellationToken = default)
+    {
+        var repositoryResponse = await recipesRepository.GetRecipe((RecipeId)id, cancellationToken);
+
+        return repositoryResponse.Match(
+            recipe => Results.Ok(RecipeResponse.FromRecipe(recipe)),
+            _ => Results.NotFound());
     }
 
     private static async Task<IResult> CreateRecipe(CreateRecipeRequest request, IRecipesRepository recipesRepository,
