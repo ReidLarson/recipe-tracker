@@ -16,7 +16,7 @@ public class RecipesRepository : IRecipesRepository
         _dbConnectionFactory = dbConnectionFactory;
     }
 
-    public async Task<IEnumerable<Recipe>> GetAllRecipes(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Recipe>> GetAllRecipesAsync(CancellationToken cancellationToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var recipes = await connection.QueryAsync<Recipe>(
@@ -32,7 +32,8 @@ public class RecipesRepository : IRecipesRepository
         return recipes;
     }
 
-    public async Task<OneOf<Recipe, NotFound>> GetRecipe(RecipeId id, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Recipe, NotFound>> GetRecipeAsync(RecipeId id,
+        CancellationToken cancellationToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 
@@ -53,7 +54,7 @@ public class RecipesRepository : IRecipesRepository
             : recipe;
     }
 
-    public async Task<Recipe> CreateRecipe(CreateRecipeCommand createRecipeCommand,
+    public async Task<Recipe> CreateRecipeAsync(CreateRecipeCommand createRecipeCommand,
         CancellationToken cancellationToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
@@ -72,7 +73,6 @@ public class RecipesRepository : IRecipesRepository
         return recipe;
     }
 
-    public async Task<OneOf<Success, NotFound>> DeleteRecipe(RecipeId id, CancellationToken cancellationToken = default)
     public async Task<OneOf<Recipe, NotFound>> UpdateRecipeAsync(UpdateRecipeCommand updateRecipeCommand,
         CancellationToken cancellationToken = default)
     {
@@ -98,6 +98,8 @@ public class RecipesRepository : IRecipesRepository
             : recipe;
     }
 
+    public async Task<OneOf<Success, NotFound>> DeleteRecipeAsync(RecipeId id,
+        CancellationToken cancellationToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var rowsAffected = await connection.ExecuteAsync(

@@ -46,7 +46,7 @@ public class RecipesEndpoints : IEndpoints
     private static async Task<IResult> GetAllRecipes(IRecipesRepository recipesRepository,
         CancellationToken cancellationToken = default)
     {
-        var recipes = await recipesRepository.GetAllRecipes(cancellationToken);
+        var recipes = await recipesRepository.GetAllRecipesAsync(cancellationToken);
 
         var response = recipes.Select(RecipeResponse.FromRecipe);
 
@@ -56,7 +56,7 @@ public class RecipesEndpoints : IEndpoints
     private static async Task<IResult> GetRecipe(int id, IRecipesRepository recipesRepository,
         CancellationToken cancellationToken = default)
     {
-        var repositoryResponse = await recipesRepository.GetRecipe((RecipeId)id, cancellationToken);
+        var repositoryResponse = await recipesRepository.GetRecipeAsync((RecipeId)id, cancellationToken);
 
         return repositoryResponse.Match(
             recipe => Results.Ok(RecipeResponse.FromRecipe(recipe)),
@@ -67,6 +67,7 @@ public class RecipesEndpoints : IEndpoints
         CancellationToken cancellationToken = default)
     {
         var recipe = await recipesRepository.CreateRecipe(request.ToCreateRecipeCommand(), cancellationToken);
+        var recipe = await recipesRepository.CreateRecipeAsync(request.ToCreateRecipeCommand(), cancellationToken);
 
         var response = RecipeResponse.FromRecipe(recipe);
 
@@ -88,7 +89,7 @@ public class RecipesEndpoints : IEndpoints
     private static async Task<IResult> DeleteRecipe(int id, IRecipesRepository recipesRepository,
         CancellationToken cancellationToken = default)
     {
-        var repositoryResponse = await recipesRepository.DeleteRecipe((RecipeId)id, cancellationToken);
+        var repositoryResponse = await recipesRepository.DeleteRecipeAsync((RecipeId)id, cancellationToken);
 
         return repositoryResponse.Match(
             _ => Results.NoContent(),
