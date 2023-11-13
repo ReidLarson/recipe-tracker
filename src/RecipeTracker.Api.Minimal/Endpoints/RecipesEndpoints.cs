@@ -14,7 +14,7 @@ public class RecipesEndpoints : IEndpoints
 
     public static void DefineEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapGet(BaseRoute, GetAllRecipes)
+        app.MapGet($"{BaseRoute}", GetAllRecipes)
             .WithName(nameof(GetAllRecipes))
             .Produces<IEnumerable<RecipeResponse>>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
             .WithTags(Tag);
@@ -25,7 +25,7 @@ public class RecipesEndpoints : IEndpoints
             .Produces(StatusCodes.Status404NotFound)
             .WithTags(Tag);
 
-        app.MapPost(BaseRoute, CreateRecipe)
+        app.MapPost($"{BaseRoute}", CreateRecipe)
             .WithName(nameof(CreateRecipe))
             .Accepts<CreateRecipeRequest>(MediaTypeNames.Application.Json)
             .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
