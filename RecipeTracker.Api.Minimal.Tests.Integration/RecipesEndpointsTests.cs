@@ -9,7 +9,10 @@ namespace RecipeTracker.Api.Minimal.Tests.Integration;
 
 public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAsyncLifetime
 {
-    private readonly List<int> _createdRecipeIds = new();
+    private readonly Faker<CreateRecipeRequest> _createRecipeRequest = new Faker<CreateRecipeRequest>()
+        .RuleFor(request => request.Name, f => f.Commerce.ProductName())
+        .RuleFor(request => request.Description, faker => faker.Commerce.ProductDescription());
+
     private readonly RecipeTrackerApiFactory _recipeTrackerApiFactory;
 
     public RecipesEndpointsTests(RecipeTrackerApiFactory recipeTrackerApiFactory)
@@ -25,7 +28,44 @@ public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAs
     public async Task DisposeAsync()
     {
         var httpClient = _recipeTrackerApiFactory.CreateClient();
-        foreach (var recipeId in _createdRecipeIds) await httpClient.DeleteAsync($"/recipes/{recipeId}");
+
+        var getAllRecipesResponse = await httpClient.GetAsync("/recipes");
+        var recipes = await getAllRecipesResponse.Content.ReadFromJsonAsync<IEnumerable<RecipeResponse>>();
+
+        foreach (var recipeId in recipes!.Select(recipe => recipe.Id)) await httpClient.DeleteAsync($"/recipes/{recipeId}");
+    }
+
+    [Fact]
+    public async Task GetAllRecipes_ReturnsRecipes_WhenRecipesExist()
+    {
+        // Arrange
+        var httpClient = _recipeTrackerApiFactory.CreateClient();
+        var createRecipeRequest = _createRecipeRequest.Generate();
+        var createResponse = await httpClient.PostAsJsonAsync("/recipes", createRecipeRequest);
+        var existingRecipe = await createResponse.Content.ReadFromJsonAsync<RecipeResponse>();
+        
+        // Act
+        var response = await httpClient.GetAsync("/recipes");
+        var recipes = await response.Content.ReadFromJsonAsync<IEnumerable<RecipeResponse>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        recipes.Should().ContainEquivalentOf(existingRecipe);
+    }
+
+    [Fact]
+    public async Task GetAllRecipes_ReturnsEmptyArray_WhenNoRecipesExist()
+    {
+        // Arrange
+        var httpClient = _recipeTrackerApiFactory.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync("/recipes");
+        var recipes = await response.Content.ReadFromJsonAsync<IEnumerable<RecipeResponse>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        recipes.Should().BeEmpty();
     }
 
     [Fact]
@@ -33,15 +73,11 @@ public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAs
     {
         // Arrange
         var httpClient = _recipeTrackerApiFactory.CreateClient();
-        var request = new Faker<CreateRecipeRequest>()
-            .RuleFor(request => request.Name, f => f.Commerce.ProductName())
-            .RuleFor(request => request.Description, faker => faker.Commerce.ProductDescription())
-            .Generate();
+        var request = _createRecipeRequest.Generate();
 
         // Act
         var response = await httpClient.PostAsJsonAsync("/recipes", request);
         var createdRecipe = await response.Content.ReadFromJsonAsync<RecipeResponse>();
-        _createdRecipeIds.Add(createdRecipe!.Id);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -54,7 +90,7 @@ public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAs
     {
         // Arrange
         var httpClient = _recipeTrackerApiFactory.CreateClient();
-        var request = new Faker<CreateRecipeRequest>()
+        var request = _createRecipeRequest.Clone()
             .RuleFor(request => request.Name, string.Empty)
             .RuleFor(request => request.Description, string.Empty)
             .Generate();
