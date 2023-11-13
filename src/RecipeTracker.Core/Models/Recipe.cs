@@ -19,13 +19,13 @@ public readonly record struct RecipeId(int Value)
         return new RecipeId(id);
     }
 
-    public static explicit operator RecipeId(Int64 id)
+    public static explicit operator RecipeId(long id)
     {
         return new RecipeId((int)id);
     }
 
     public override string ToString()
     {
-        return this.Value.ToString();
+        return Value.ToString();
     }
 }
