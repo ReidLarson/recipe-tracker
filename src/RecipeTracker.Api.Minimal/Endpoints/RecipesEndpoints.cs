@@ -30,6 +30,12 @@ public class RecipesEndpoints : IEndpoints
             .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
             .WithTags(Tag);
 
+        app.MapPut($"{BaseRoute}/{{id:int}}", UpdateRecipe)
+            .WithName(nameof(UpdateRecipe))
+            .Accepts<UpdateRecipeRequest>(MediaTypeNames.Application.Json)
+            .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .WithTags(Tag);
+
         app.MapDelete($"{BaseRoute}/{{id:int}}", DeleteRecipe)
             .WithName(nameof(DeleteRecipe))
             .Produces(StatusCodes.Status204NoContent)
@@ -65,6 +71,18 @@ public class RecipesEndpoints : IEndpoints
         var response = RecipeResponse.FromRecipe(recipe);
 
         return Results.Ok(response);
+    }
+
+    private static async Task<IResult> UpdateRecipe(int id, UpdateRecipeRequest request,
+        IRecipesRepository recipesRepository, CancellationToken cancellationToken = default)
+    {
+        var repositoryResponse =
+            await recipesRepository.UpdateRecipeAsync(request.ToUpdateRecipeCommand((RecipeId)id), cancellationToken);
+
+        return repositoryResponse.Match(
+            recipe => Results.Ok(RecipeResponse.FromRecipe(recipe)),
+            _ => Results.NotFound()
+        );
     }
 
     private static async Task<IResult> DeleteRecipe(int id, IRecipesRepository recipesRepository,

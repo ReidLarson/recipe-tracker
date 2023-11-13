@@ -73,6 +73,31 @@ public class RecipesRepository : IRecipesRepository
     }
 
     public async Task<OneOf<Success, NotFound>> DeleteRecipe(RecipeId id, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Recipe, NotFound>> UpdateRecipeAsync(UpdateRecipeCommand updateRecipeCommand,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        var recipe = await connection.QuerySingleOrDefaultAsync<Recipe>(
+            new CommandDefinition(
+                """
+                UPDATE recipes
+                SET
+                    name = @Name,
+                    description = @Description
+                WHERE
+                    id = @Id
+                RETURNING id, name, description
+                """,
+                new { Id = updateRecipeCommand.Id.Value, updateRecipeCommand.Name, updateRecipeCommand.Description },
+                cancellationToken: cancellationToken
+            )
+        );
+
+        return recipe is null
+            ? new NotFound()
+            : recipe;
+    }
+
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();
         var rowsAffected = await connection.ExecuteAsync(
