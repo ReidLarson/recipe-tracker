@@ -38,6 +38,7 @@ public class RecipesEndpoints : IEndpoints
             .Accepts<UpdateRecipeRequest>(MediaTypeNames.Application.Json)
             .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
             .Produces<ValidationErrorResponse>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)
+            .Produces(StatusCodes.Status404NotFound)
             .WithTags(Tag);
 
         app.MapDelete($"{BaseRoute}/{{id:int}}", DeleteRecipe)
