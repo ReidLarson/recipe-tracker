@@ -32,7 +32,8 @@ public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAs
         var getAllRecipesResponse = await httpClient.GetAsync("/recipes");
         var recipes = await getAllRecipesResponse.Content.ReadFromJsonAsync<IEnumerable<RecipeResponse>>();
 
-        foreach (var recipeId in recipes!.Select(recipe => recipe.Id)) await httpClient.DeleteAsync($"/recipes/{recipeId}");
+        foreach (var recipeId in recipes!.Select(recipe => recipe.Id))
+            await httpClient.DeleteAsync($"/recipes/{recipeId}");
     }
 
     [Fact]
@@ -43,7 +44,7 @@ public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAs
         var createRecipeRequest = _createRecipeRequest.Generate();
         var createResponse = await httpClient.PostAsJsonAsync("/recipes", createRecipeRequest);
         var existingRecipe = await createResponse.Content.ReadFromJsonAsync<RecipeResponse>();
-        
+
         // Act
         var response = await httpClient.GetAsync("/recipes");
         var recipes = await response.Content.ReadFromJsonAsync<IEnumerable<RecipeResponse>>();
@@ -66,6 +67,36 @@ public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAs
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         recipes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetRecipeById_ReturnsRecipe_WhenRecipeExists()
+    {
+        // Arrange
+        var httpClient = _recipeTrackerApiFactory.CreateClient();
+        var createRecipeResponse = await httpClient.PostAsJsonAsync("/recipes", _createRecipeRequest.Generate());
+        var existentRecipe = await createRecipeResponse.Content.ReadFromJsonAsync<RecipeResponse>();
+
+        // Act
+        var response = await httpClient.GetAsync($"/recipes/{existentRecipe!.Id}");
+        var recipe = await response.Content.ReadFromJsonAsync<RecipeResponse>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        recipe.Should().BeEquivalentTo(existentRecipe);
+    }
+
+    [Fact]
+    public async Task GetRecipeById_ReturnsNotFound_WhenRecipeDoesNotExist()
+    {
+        // Arrange
+        var httpClient = _recipeTrackerApiFactory.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"/recipes/1");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]

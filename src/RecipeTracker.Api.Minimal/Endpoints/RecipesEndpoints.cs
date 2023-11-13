@@ -20,8 +20,8 @@ public class RecipesEndpoints : IEndpoints
             .Produces<IEnumerable<RecipeResponse>>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
             .WithTags(Tag);
 
-        app.MapGet($"{BaseRoute}/{{id:int}}", GetRecipe)
-            .WithName(nameof(GetRecipe))
+        app.MapGet($"{BaseRoute}/{{id:int}}", GetRecipeById)
+            .WithName(nameof(GetRecipeById))
             .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
             .Produces(StatusCodes.Status404NotFound)
             .WithTags(Tag);
@@ -57,10 +57,10 @@ public class RecipesEndpoints : IEndpoints
         return Results.Ok(response);
     }
 
-    private static async Task<IResult> GetRecipe(int id, IRecipesRepository recipesRepository,
+    private static async Task<IResult> GetRecipeById(int id, IRecipesRepository recipesRepository,
         CancellationToken cancellationToken = default)
     {
-        var repositoryResponse = await recipesRepository.GetRecipeAsync((RecipeId)id, cancellationToken);
+        var repositoryResponse = await recipesRepository.GetRecipeByIdAsync((RecipeId)id, cancellationToken);
 
         return repositoryResponse.Match(
             recipe => Results.Ok(RecipeResponse.FromRecipe(recipe)),
@@ -77,7 +77,7 @@ public class RecipesEndpoints : IEndpoints
 
         var response = RecipeResponse.FromRecipe(recipe);
 
-        return Results.CreatedAtRoute(nameof(GetRecipe), new { id = response.Id }, response);
+        return Results.CreatedAtRoute(nameof(GetRecipeById), new { id = response.Id }, response);
     }
 
     private static async Task<IResult> UpdateRecipe(int id, UpdateRecipeRequest request,

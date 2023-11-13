@@ -32,7 +32,7 @@ public class RecipesRepository : IRecipesRepository
         return recipes;
     }
 
-    public async Task<OneOf<Recipe, NotFound>> GetRecipeAsync(RecipeId id,
+    public async Task<OneOf<Recipe, NotFound>> GetRecipeByIdAsync(RecipeId id,
         CancellationToken cancellationToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync();

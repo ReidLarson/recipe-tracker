@@ -9,7 +9,7 @@ public interface IRecipesRepository
 {
     Task<IEnumerable<Recipe>> GetAllRecipesAsync(CancellationToken cancellationToken = default);
 
-    Task<OneOf<Recipe, NotFound>> GetRecipeAsync(RecipeId id, CancellationToken cancellationToken = default);
+    Task<OneOf<Recipe, NotFound>> GetRecipeByIdAsync(RecipeId id, CancellationToken cancellationToken = default);
 
     Task<Recipe> CreateRecipeAsync(CreateRecipeCommand createRecipeCommand, CancellationToken cancellationToken = default);
 
