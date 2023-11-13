@@ -2,6 +2,7 @@ using System.Net.Mime;
 using RecipeTracker.Api.Minimal.Contracts.Requests;
 using RecipeTracker.Api.Minimal.Contracts.Responses;
 using RecipeTracker.Api.Minimal.Endpoints.Internal;
+using RecipeTracker.Api.Minimal.Validators;
 using RecipeTracker.Core.Models;
 using RecipeTracker.Core.Repositories;
 
@@ -29,6 +30,7 @@ public class RecipesEndpoints : IEndpoints
             .WithName(nameof(CreateRecipe))
             .Accepts<CreateRecipeRequest>(MediaTypeNames.Application.Json)
             .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .Produces<ValidationErrorResponse>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)
             .WithTags(Tag);
 
         app.MapPut($"{BaseRoute}/{{id:int}}", UpdateRecipe)
@@ -65,9 +67,14 @@ public class RecipesEndpoints : IEndpoints
     }
 
     private static async Task<IResult> CreateRecipe(CreateRecipeRequest request, IRecipesRepository recipesRepository,
-        CancellationToken cancellationToken = default)
+        CreateRecipeRequestValidator requestValidator, CancellationToken cancellationToken = default)
     {
-        var recipe = await recipesRepository.CreateRecipe(request.ToCreateRecipeCommand(), cancellationToken);
+        var validationResult = await requestValidator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            return Results.BadRequest(validationResult.ToValidationErrorResponse());
+        }
+        
         var recipe = await recipesRepository.CreateRecipeAsync(request.ToCreateRecipeCommand(), cancellationToken);
 
         var response = RecipeResponse.FromRecipe(recipe);

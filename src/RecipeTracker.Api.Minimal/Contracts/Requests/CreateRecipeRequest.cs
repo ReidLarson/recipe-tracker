@@ -4,12 +4,15 @@ namespace RecipeTracker.Api.Minimal.Contracts.Requests;
 
 public class CreateRecipeRequest
 {
-    public required string Name { get; init; }
-    public required string Description { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
 
-    public CreateRecipeCommand ToCreateRecipeCommand() => new()
+    public CreateRecipeCommand ToCreateRecipeCommand()
     {
-        Name = Name,
-        Description = Description
-    };
+        return new CreateRecipeCommand
+        {
+            Name = Name,
+            Description = Description
+        };
+    }
 }

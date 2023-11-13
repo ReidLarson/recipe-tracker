@@ -1,3 +1,4 @@
+using FluentValidation;
 using RecipeTracker.Api.Minimal.Endpoints.Internal;
 using RecipeTracker.Core.Data;
 using RecipeTracker.Core.Repositories;
@@ -12,6 +13,8 @@ builder.Services.AddScoped<IRecipesRepository, RecipesRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 
