@@ -190,7 +190,35 @@ public class RecipesEndpointsTests : IClassFixture<RecipeTrackerApiFactory>, IAs
         var httpClient = _recipeTrackerApiFactory.CreateClient();
 
         // Act
-        var response = await httpClient.PutAsJsonAsync($"/recipes/1", _updateRecipeRequest.Generate());
+        var response = await httpClient.PutAsJsonAsync("/recipes/1", _updateRecipeRequest.Generate());
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteRecipe_ReturnsNoContent_WhenRecipeExists()
+    {
+        // Arrange
+        var httpClient = _recipeTrackerApiFactory.CreateClient();
+        var createRecipeResponse = await httpClient.PostAsJsonAsync("/recipes", _createRecipeRequest.Generate());
+        var existentRecipe = await createRecipeResponse.Content.ReadFromJsonAsync<RecipeResponse>();
+
+        // Act
+        var response = await httpClient.DeleteAsync($"/recipes/{existentRecipe!.Id}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task DeleteRecipe_ReturnsNotFound_WhenRecipeDoesNotExist()
+    {
+        // Arrange
+        var httpClient = _recipeTrackerApiFactory.CreateClient();
+
+        // Act
+        var response = await httpClient.PutAsJsonAsync("/recipes/1", _updateRecipeRequest.Generate());
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
