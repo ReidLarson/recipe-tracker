@@ -37,6 +37,7 @@ public class RecipesEndpoints : IEndpoints
             .WithName(nameof(UpdateRecipe))
             .Accepts<UpdateRecipeRequest>(MediaTypeNames.Application.Json)
             .Produces<RecipeResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .Produces<ValidationErrorResponse>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)
             .WithTags(Tag);
 
         app.MapDelete($"{BaseRoute}/{{id:int}}", DeleteRecipe)
@@ -70,11 +71,8 @@ public class RecipesEndpoints : IEndpoints
         CreateRecipeRequestValidator requestValidator, CancellationToken cancellationToken = default)
     {
         var validationResult = await requestValidator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            return Results.BadRequest(validationResult.ToValidationErrorResponse());
-        }
-        
+        if (!validationResult.IsValid) return Results.BadRequest(validationResult.ToValidationErrorResponse());
+
         var recipe = await recipesRepository.CreateRecipeAsync(request.ToCreateRecipeCommand(), cancellationToken);
 
         var response = RecipeResponse.FromRecipe(recipe);
@@ -83,8 +81,12 @@ public class RecipesEndpoints : IEndpoints
     }
 
     private static async Task<IResult> UpdateRecipe(int id, UpdateRecipeRequest request,
-        IRecipesRepository recipesRepository, CancellationToken cancellationToken = default)
+        IRecipesRepository recipesRepository, UpdateRecipeRequestValidator requestValidator,
+        CancellationToken cancellationToken = default)
     {
+        var validationResults = await requestValidator.ValidateAsync(request, cancellationToken);
+        if (!validationResults.IsValid) return Results.BadRequest(validationResults.ToValidationErrorResponse());
+
         var repositoryResponse =
             await recipesRepository.UpdateRecipeAsync(request.ToUpdateRecipeCommand((RecipeId)id), cancellationToken);
 
