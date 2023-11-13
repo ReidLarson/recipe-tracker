@@ -77,7 +77,7 @@ public class RecipesEndpoints : IEndpoints
 
         var response = RecipeResponse.FromRecipe(recipe);
 
-        return Results.Ok(response);
+        return Results.CreatedAtRoute(nameof(GetRecipe), new { id = response.Id }, response);
     }
 
     private static async Task<IResult> UpdateRecipe(int id, UpdateRecipeRequest request,
