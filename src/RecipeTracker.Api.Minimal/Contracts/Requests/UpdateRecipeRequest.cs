@@ -1,7 +1,7 @@
 using RecipeTracker.Core.Commands;
 using RecipeTracker.Core.Models;
 
-namespace RecipeTracker.Api.Minimal.Contracts.Responses;
+namespace RecipeTracker.Api.Minimal.Contracts.Requests;
 
 public class UpdateRecipeRequest
 {

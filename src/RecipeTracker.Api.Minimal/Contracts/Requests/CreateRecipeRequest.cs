@@ -1,6 +1,6 @@
 using RecipeTracker.Core.Commands;
 
-namespace RecipeTracker.Api.Minimal.Contracts.Responses;
+namespace RecipeTracker.Api.Minimal.Contracts.Requests;
 
 public class CreateRecipeRequest
 {

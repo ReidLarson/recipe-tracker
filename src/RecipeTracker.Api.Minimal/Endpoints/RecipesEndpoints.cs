@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using RecipeTracker.Api.Minimal.Contracts.Requests;
 using RecipeTracker.Api.Minimal.Contracts.Responses;
 using RecipeTracker.Api.Minimal.Endpoints.Internal;
 using RecipeTracker.Core.Models;
